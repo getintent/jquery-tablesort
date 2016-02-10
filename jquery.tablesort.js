@@ -12,12 +12,7 @@
 		this.settings = $.extend({}, $.tablesort.defaults, settings);
 		this.$sortCells = this.$thead.length > 0 ? this.$thead.find('th:not(.no-sort)') : this.$table.find('th:not(.no-sort)');
 		this.$sortCells.bind('click.tablesort', function() {
-			if($(this).hasClass('sorted')) {
-				self.sort($(this));
-			} else {
-				self.sort($(this), self.settings.defaultDirection);
-			}
-			
+			self.sort($(this));
 		});
 		this.index = null;
 		this.$th = null;
@@ -34,7 +29,8 @@
 				rows = this.$thead.length > 0 ? table.find('tbody tr') : table.find('tr').has('td'),
 				cells = table.find('tr td:nth-of-type(' + (th.index() + 1) + ')'),
 				sortBy = th.data().sortBy,
-				sortedMap = [];
+				sortedMap = [],
+				sorted = th.hasClass("sorted");
 
 			var unsortedValues = cells.map(function(idx, cell) {
 				if (sortBy)
@@ -44,7 +40,11 @@
 			if (unsortedValues.length === 0) return;
 
 			if (direction !== 'asc' && direction !== 'desc')
-				this.direction = this.direction === 'asc' ? 'desc' : 'asc';
+				if(sorted) {
+					this.direction = this.direction === 'asc' ? 'desc' : 'asc';
+				} else {
+					this.direction = this.direction ? this.direction : this.settings.defaultDirection;
+				}
 			else
 				this.direction = direction;
 
