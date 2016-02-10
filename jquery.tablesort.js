@@ -12,7 +12,12 @@
 		this.settings = $.extend({}, $.tablesort.defaults, settings);
 		this.$sortCells = this.$thead.length > 0 ? this.$thead.find('th:not(.no-sort)') : this.$table.find('th:not(.no-sort)');
 		this.$sortCells.bind('click.tablesort', function() {
-			self.sort($(this));
+			if($(this).hasClass('sorted')) {
+				self.sort($(this));
+			} else {
+				self.sort($(this), self.settings.defaultDirection);
+			}
+			
 		});
 		this.index = null;
 		this.$th = null;
@@ -106,7 +111,8 @@
 	$.tablesort.defaults = {
 		debug: $.tablesort.DEBUG,
 		asc: 'sorted ascending',
-		desc: 'sorted descending'
+		desc: 'sorted descending',
+		defaultDirection: 'asc'
 	};
 
 	$.fn.tablesort = function(settings) {
