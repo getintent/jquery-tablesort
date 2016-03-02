@@ -1,7 +1,7 @@
 /*
 	A simple, lightweight jQuery plugin for creating sortable tables.
 	https://github.com/kylefox/jquery-tablesort
-	Version 0.0.6
+	Version 0.0.7
 */
 
 (function($) {
@@ -11,6 +11,7 @@
 		this.$thead = this.$table.find('thead');
 		this.settings = $.extend({}, $.tablesort.defaults, settings);
 		this.$sortCells = this.$thead.length > 0 ? this.$thead.find('th:not(.no-sort)') : this.$table.find('th:not(.no-sort)');
+		this.initCells();
 		this.$sortCells.bind('click.tablesort', function() {
 			self.sort($(this));
 		});
@@ -21,13 +22,29 @@
 
 	$.tablesort.prototype = {
 
+		initCells: function() {
+			var self = this,
+				curIndex = 0;
+			this.$sortCells.each(function(indx, elem){
+				$(elem).attr("data-sort-index", indx);
+				self.$table.find('tr td:nth-child('+ (curIndex + 1) +')').attr("data-sort-index", indx);
+
+				if($(elem).attr("colspan")) {
+					curIndex += parseInt($(elem).attr("colspan"));
+				} else {
+					curIndex += parseInt(1);
+				}
+			});
+		},
+
 		sort: function(th, direction) {
 			var start = new Date(),
 				self = this,
 				table = this.$table,
 				//body = table.find('tbody').length > 0 ? table.find('tbody') : table,
 				rows = this.$thead.length > 0 ? table.find('tbody tr') : table.find('tr').has('td'),
-				cells = table.find('tr td:nth-of-type(' + (th.index() + 1) + ')'),
+				// cells = table.find('tr td:nth-of-type(' + (th.index() + 1) + ')'),
+				cells = table.find('tr td[data-sort-index=' + (th.attr("data-sort-index")) + ']'),
 				sortBy = th.data().sortBy,
 				sortedMap = [],
 				sorted = th.hasClass("sorted");
